@@ -200,7 +200,7 @@ function buildPdf(d,save){
   const ORANGE=[226,107,22], INK=[20,20,20], MUTED=[94,94,94];
   const foot=()=>{doc.setFontSize(8.5);doc.setTextColor(...MUTED);doc.text(clean("Persona-Werkstatt · Gründungswerkstatt Anka, Anna, Theresa"+(d.von?" · ausgefüllt von "+d.von:"")+" · "+new Date().toLocaleDateString("de-DE")),M,287);};
   const need=h=>{if(y+h>278){foot();doc.addPage();y=20;}};
-  try{doc.addImage(LOGO_ON_LIGHT,"PNG",W-M-42,14,42,7.3);}catch(e){}
+  try{doc.addImage(LOGO_ON_LIGHT,"PNG",W-M-42,14,42,7.3,undefined,"FAST");}catch(e){}
   doc.setFont("helvetica","bold");doc.setFontSize(10);doc.setTextColor(...ORANGE);doc.text("PERSONA",M,y);y+=11;
   doc.setFontSize(26);doc.setTextColor(...INK);
   const nm=doc.splitTextToSize(clean(d.name||"Ohne Namen"),CW);doc.text(nm,M,y);y+=nm.length*10;
