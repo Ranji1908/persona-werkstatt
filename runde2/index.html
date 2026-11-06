@@ -378,7 +378,7 @@ function render() {
     el("div", { class: "tabs", role: "tablist", "aria-label": "Schritte" }, tabs.map(([id, t]) =>
       el("button", { class: "tab", type: "button", role: "tab", "aria-selected": String(state.tab === id),
         onclick: () => { warteschlange.then(() => { state.tab = id; render(); scrollTo(0, 0); }); } }, t))),
-    ...inhalt);
+    ...inhalt.flat());
 }
 
 async function lade() {
