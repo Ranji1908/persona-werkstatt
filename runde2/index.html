@@ -203,7 +203,7 @@ function el(tag, attrs, ...kids) {
     else if (k === "class") n.className = v;
     else n.setAttribute(k, v === true ? "" : v);
   }
-  for (const c of kids.flat()) if (c !== null && c !== undefined && c !== false) n.append(c);
+  for (const c of kids.flat(Infinity)) if (c !== null && c !== undefined && c !== false) n.append(c);
   return n;
 }
 
@@ -299,7 +299,7 @@ function renderPersonas() {
 function personaTabs() {
   return el("div", { class: "tabs sub", role: "tablist", "aria-label": "Persona wählen" }, PERSONAS.map(p =>
     el("button", { class: "tab", type: "button", role: "tab", "aria-selected": String(state.persona === p),
-      onclick: () => { state.persona = p; render(); } }, txt(p, "name"))));
+      onclick: () => { warteschlange.then(() => { state.persona = p; render(); }); } }, txt(p, "name"))));
 }
 
 function renderKern() {
@@ -311,7 +311,7 @@ function renderKern() {
     if (alle[0] && alle[0].autor !== "Entwurf") box.append(el("span", { class: "fmeta" }, `zuletzt von ${alle[0].autor}, ${datum(alle[0].createdAt)}`));
     if (alle.length > 1) box.append(el("details", { class: "hist" }, el("summary", {}, `Frühere Fassungen (${alle.length - 1})`),
       alle.slice(1).map(a => el("div", {}, `${a.autor === "Entwurf" ? "Erster Entwurf" : a.autor}, ${datum(a.createdAt)}: ${a.inhalt || "(leer)"} `,
-        el("button", { class: "linkbtn", type: "button", onclick: () => { speichere("kern", p, feld, a.inhalt); setTimeout(render, 900); } }, "wiederherstellen")))));
+        el("button", { class: "linkbtn", type: "button", onclick: () => { speichere("kern", p, feld, a.inhalt); warteschlange.then(render); } }, "wiederherstellen")))));
     return box;
   })));
   return [
@@ -353,12 +353,12 @@ function renderBmc() {
       }))));
   return [
     el("h2", {}, "Kanäle, Kundenbindung, Einnahmen"),
-    el("p", { class: "note" }, `Bitte teilt die Arbeit nicht auf: Jede von euch füllt das für alle drei Personas aus, jede aus ihrer eigenen Sicht. Was die anderen geschrieben haben, könnt ihr aufklappen. Schreibt am besten erst eure eigene Antwort, ${state.ich}.`),
+    el("p", { class: "note" }, "Bitte teilt die Arbeit nicht auf: Jede von euch füllt das für alle drei Personas aus, jede aus ihrer eigenen Sicht. Schreib am besten erst deine eigene Antwort, bevor du aufklappst, was die anderen geschrieben haben."),
     fortschritt,
     el("div", { style: "height:18px" }),
     personaTabs(),
     el("form", { class: "card", autocomplete: "off", onsubmit: e => e.preventDefault() }, bloecke),
-    el("div", { class: "row", style: "margin-top:16px" }, PERSONAS.filter(x => x !== p).map(x => el("button", { class: "tab", type: "button", onclick: () => { state.persona = x; render(); scrollTo(0, 0); } }, `Weiter mit ${txt(x, "name")}`)))
+    el("div", { class: "row", style: "margin-top:16px" }, PERSONAS.filter(x => x !== p).map(x => el("button", { class: "tab", type: "button", onclick: () => { warteschlange.then(() => { state.persona = x; render(); scrollTo(0, 0); }); } }, `Weiter mit ${txt(x, "name")}`)))
   ];
 }
 
@@ -378,7 +378,7 @@ function render() {
     el("div", { class: "tabs", role: "tablist", "aria-label": "Schritte" }, tabs.map(([id, t]) =>
       el("button", { class: "tab", type: "button", role: "tab", "aria-selected": String(state.tab === id),
         onclick: () => { warteschlange.then(() => { state.tab = id; render(); scrollTo(0, 0); }); } }, t))),
-    ...inhalt.flat());
+    ...inhalt);
 }
 
 async function lade() {
